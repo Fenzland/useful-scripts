@@ -1,11 +1,11 @@
 [gitbranch repeat]
 Description=gitbranch repeat
+acceptfocus=false
+acceptfocusrule=2
 below=true
 belowrule=2
 clientmachine=localhost
 clientmachinematch=0
-noborder=true
-noborderrule=2
 position=3516,1620
 positionrule=2
 size=400,522

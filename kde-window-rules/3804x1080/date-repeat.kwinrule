@@ -2,8 +2,12 @@
 Description=date repeat
 above=true
 aboverule=2
+acceptfocus=false
+acceptfocusrule=2
 desktop=-1
 desktoprule=2
+noborder=true
+noborderrule=2
 opacityactive=100
 opacityactiverule=2
 opacityinactive=66
