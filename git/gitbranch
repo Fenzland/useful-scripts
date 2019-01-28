@@ -1,4 +1,4 @@
-#!/usr/bin/php -q
+#!/usr/bin/env php
 <?php
 echo "\033[0m";
 echo `git branch --no-merged`;
