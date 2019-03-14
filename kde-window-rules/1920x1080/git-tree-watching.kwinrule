@@ -1,0 +1,19 @@
+[git tree watching]
+Description=git tree watching
+acceptfocus=true
+acceptfocusrule=2
+below=true
+belowrule=2
+position=960,256
+positionrule=2
+size=960,824
+sizerule=2
+skipswitcher=true
+skipswitcherrule=2
+skiptaskbar=true
+skiptaskbarrule=2
+title=git-tree-w
+titlematch=2
+wmclass=konsole
+wmclasscomplete=false
+wmclassmatch=1
