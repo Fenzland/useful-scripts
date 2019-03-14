@@ -1,9 +1,8 @@
-#!/usr/bin/env php
-<?php
-echo "\033[0m";
-echo `git branch --no-merged`;
-echo "\033[32m";
-echo `git branch --merged`;
-echo "\033[31m";
-echo `git branch -r`;
-echo "\033[0m";
+#!/bin/bash
+echo -ne "\033[0m";
+git branch --color=never --no-merged;
+echo -ne "\033[32m";
+git branch --color=never --merged;
+echo -ne "\033[31m";
+git branch --color=never -r;
+echo -ne "\033[0m";
