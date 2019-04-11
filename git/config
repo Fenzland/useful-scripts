@@ -2,7 +2,6 @@
 	editor= vim
 [color]
 	ui= true
-	status= always
 [color "status"]
 	changed= yellow
 [alias]

@@ -1,2 +1,2 @@
 #!/bin/bash
-watch -ct -n0.5 git status -sb
+watch -ct -n0.5 git -c color.status=always status -sb
