@@ -9,9 +9,9 @@
 	t= log --graph --all --date-order --left-right --pretty=format:'%C(auto)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cd) %C(blue)<%an>%Creset' --abbrev-commit --date='format:%m-%d %a %H:%M'
 	tree-branch= log --graph --date-order --left-right --pretty=format:'%C(auto)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cd) %C(blue)<%an>%Creset' --abbrev-commit --date='format:%m-%d %a %H:%M'
 	tb= log --graph --date-order --left-right --pretty=format:'%C(auto)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cd) %C(blue)<%an>%Creset' --abbrev-commit --date='format:%m-%d %a %H:%M'
-	c= commit -m
+	c= commit --allow-empty -m
 	cc= commit
-	c-= commit --amend
+	c-= commit --allow-empty --amend
 	commit-with-add= !git add . && git commit -m a
 	ca= !git add . && git commit -m a
 	cf= clean -df
