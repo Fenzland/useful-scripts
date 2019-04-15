@@ -114,9 +114,9 @@
 	fap= fetch --all --prune
 	s= status -sb -uall
 	ss= status
-	d= diff
-	diffback= diff HEAD^
-	db= diff HEAD^
+	d= diff --ita-invisible-in-index
+	diffback= diff --ita-invisible-in-index HEAD^
+	db= diff --ita-invisible-in-index HEAD^
 	cp= cherry-pick
 	ignore= update-index --assume-unchanged
 	i= update-index --assume-unchanged
