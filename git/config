@@ -110,7 +110,8 @@
 	fetchprune= fetch --prune
 	fp= fetch --prune
 	fap= fetch --all --prune
-	s= status
+	s= status -sb -uall
+	ss= status
 	d= diff
 	diffback= diff HEAD^
 	db= diff HEAD^
