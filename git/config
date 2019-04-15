@@ -115,6 +115,10 @@
 	s= status -sb -uall
 	ss= status
 	d= diff --ita-invisible-in-index
+	diffcached= diff --ita-invisible-in-index --cached
+	dc= diff --ita-invisible-in-index --cached
+	diffhead= diff --ita-invisible-in-index HEAD
+	dh= diff --ita-invisible-in-index HEAD
 	diffback= diff --ita-invisible-in-index HEAD^
 	db= diff --ita-invisible-in-index HEAD^
 	cp= cherry-pick
