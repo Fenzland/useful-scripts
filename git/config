@@ -20,6 +20,8 @@
 	ap= add -p
 	addall= add -A .
 	aa= add -A .
+	add-untracked= !git add --intent-to-add `git status -s | grep '??' | sed 's/^??\\s//g'`
+	au= !git add --intent-to-add `git status -s | grep '??' | sed 's/^??\\s//g'`
 	o= checkout
 	checkoutforce= checkout -f
 	of= checkout -f
