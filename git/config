@@ -74,8 +74,11 @@
 	r-----h= reset --hard HEAD@{5}
 	r------h= reset --hard HEAD@{6}
 	r-------h= reset --hard HEAD@{7}
+	fast-forward= merge --ff-only
+	ff= merge --ff-only
 	m= merge --no-ff
-	mff= merge --ff-only
+	mb= merge --abort
+	mc= merge --continue
 	mt= !git-merge-to
 	checkoutmerge= checkout --merge
 	om= checkout --merge
@@ -112,6 +115,10 @@
 	fetchprune= fetch --prune
 	fp= fetch --prune
 	fap= fetch --all --prune
+	hash= log -1 --pretty=format:%H
+	h= log -1 --pretty=format:%H
+	short-hash= log -1 --pretty=format:%h
+	sh= log -1 --pretty=format:%h
 	s= status -sb -uall
 	ss= status
 	d= diff --ita-invisible-in-index
@@ -133,3 +140,9 @@
 	unignore= update-index --no-assume-unchanged
 	ui= update-index --no-assume-unchanged
 	rv= remote -v
+	rl= rev-list -1
+	move-head= update-ref --no-deref HEAD
+	mh= update-ref --no-deref HEAD
+	ref-to= symbolic-ref HEAD
+	rt= symbolic-ref HEAD
+	vp= rev-parse
