@@ -16,3 +16,5 @@ set PATH $PATH ./vendor/bin $HOME/.composer/vendor/bin
 set PATH $PATH $HOME/.deno/bin
 
 set PATH . $PATH
+
+set fish_greeting ''
