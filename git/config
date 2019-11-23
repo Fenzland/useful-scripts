@@ -6,6 +6,7 @@
 	changed= yellow
 [alias]
 	w= watch
+	g= goto
 	tree= log --graph --all --date-order --left-right --pretty=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%cd) %C(blue)<%an>%C(reset)' --abbrev-commit --date='format:%m-%d %a %H:%M'
 	t= log --graph --all --date-order --left-right --pretty=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%cd) %C(blue)<%an>%C(reset)' --abbrev-commit --date='format:%m-%d %a %H:%M'
 	tree-branch= log --graph --date-order --left-right --pretty=tformat:'%C(auto)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%cd) %C(blue)<%an>%C(reset)' --abbrev-commit --date='format:%m-%d %a %H:%M'
