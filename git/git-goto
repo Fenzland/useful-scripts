@@ -13,3 +13,8 @@ if [[ $ref ]]
 then
 	git read-tree $ref
 fi
+
+if [ -f "$(git rev-parse --show-toplevel)/.gitignore" ]
+then
+	git checkout -- "$(git rev-parse --show-toplevel)/.gitignore"
+fi
