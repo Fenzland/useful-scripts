@@ -145,6 +145,11 @@
 	rl= rev-list -1
 	move-head= update-ref --no-deref HEAD
 	mh= update-ref --no-deref HEAD
+	detach= update-ref --no-deref HEAD HEAD
+	dt= update-ref --no-deref HEAD HEAD
 	ref-to= symbolic-ref HEAD
 	rt= symbolic-ref HEAD
 	vp= rev-parse
+	git-dir= rev-parse --git-dir
+	git-path= rev-parse --git-path
+	root= rev-parse --show-toplevel
