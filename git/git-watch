@@ -8,7 +8,19 @@ fi
 
 if [[ $(which watch) == '' ]]
 then
-	echo 'require tmux';
+	echo 'require watch';
+	exit 1;
+fi
+
+if [[ $(which deno) == '' ]]
+then
+	echo 'require deno';
+	exit 1;
+fi
+
+if [[ $(which git-tree-watching) == '' ]]
+then
+	echo 'must deploy git-tree-watching';
 	exit 1;
 fi
 
@@ -19,5 +31,5 @@ then
 fi
 
 tmux split-window -h -p50 watch -ct -n0.5 git -c color.status=always s;
-tmux split-window -v -p80 watch -ct -n0.5 git tree --color=always;
+tmux split-window -v -p80 git tree-watching;
 tmux select-pane -t0;
