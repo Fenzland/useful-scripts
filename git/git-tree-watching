@@ -1,2 +1,179 @@
-#!/bin/bash
-watch -ct -n0.5 git tree --color=always
+#!/usr/bin/env -S deno --allow-run --allow-env
+import 'https://better-js.fenz.land/index.js';
+import { encode, decode, } from 'https://oxo.fenzland.com/OsO/0.1/text-encoder.js';
+
+await run( [ 'stty', '-icanon', ] );
+await Deno.stdout.write( encode( '\x1b[7l', ), );
+
+let refresh= Promise.make();
+let start= 0;
+let lines= 0;
+let columns= 0;
+
+(async ()=> {
+	while( true )
+	{
+		lines= await call( [ 'tput', 'lines', ] );
+		columns= await call( [ 'tput', 'cols', ] );
+		
+		const content= await call( [
+			'git', 'tree', '--color=always',
+		], );
+		
+		await Deno.stdout.write( encode( '\x1b[u\x1b[J', ), );
+		
+		const sliced= content
+			.split( '\n', )
+			.slice( start, start - - lines )
+			.map( ( link, index, array, )=> substr( link, 0, index === array.length - 1? columns - 8: columns, ), )
+			.implode( '\n', )
+		;
+		
+		if( !sliced )
+		{
+			if( start > 0 )
+				--start;
+			
+			continue;
+		}
+		
+		await Deno.stdout.write( encode( sliced, ), );
+		
+		await Promise.race( [ timeout( 1000, ), refresh, ], );
+		
+		refresh= Promise.make();
+	}
+})();
+
+(async ()=> {
+	let specialKey= '';
+	
+	while( true )
+	{
+		const charCode= await getCharCode();
+		
+		if( charCode === 0x1b )
+			specialKey= '\x1b';
+		else
+		if( specialKey.length )
+			specialKey+= String.fromCharCode( charCode, );
+		
+		const action= getAction( specialKey, );
+		
+		if( action )
+		{
+			specialKey= '';
+			action();
+		}
+		else
+		if( specialKey.length > 5 )
+			specialKey= '';
+		
+		if( charCode === 0x71/*q*/ )
+		{
+			await Deno.stdout.write( encode( '\x1b[u\x1b[J', ), );
+			
+			Deno.exit();
+		}
+	}
+})();
+
+function getAction( char, )
+{
+	return {
+		'\x1b[5~'/*PageUp*/:()=> {
+			if( start > lines )
+				start-= lines;
+			else
+			if( start > 0 )
+				start= 0;
+			
+			refresh.resolve();
+		},
+		'\x1b[6~'/*PageDown*/:()=> {
+			start-=- lines;
+			
+			refresh.resolve();
+		},
+		'\x1b[A'/*Up*/:()=> {
+			if( start > 0 )
+				--start;
+			
+			refresh.resolve();
+		},
+		'\x1b[B'/*Down*/:()=> {
+			++start;
+			
+			refresh.resolve();
+		},
+		'\x1b[D'/*Left*/:()=> {
+			refresh.resolve();
+		},
+		'\x1b[C'/*Right*/:()=> {
+			refresh.resolve();
+		},
+	}[char];
+}
+
+async function getCharCode()
+{
+	const buffer= new Uint8Array( 1, );
+	await Deno.stdin.read( buffer, );
+	await Deno.stdout.write( encode( buffer[0] === 0x1b? '\x1b[D\x1b[D\x1b[J': '\x1b[D\x1b[J', ), );
+	return buffer[0];
+}
+
+async function run( args, )
+{
+	const process= Deno.run( { args, }, );
+	
+	await process.status();
+	
+	process.close();
+}
+
+async function call( args, )
+{
+	const process= Deno.run( { args, stdout:'piped', }, );
+	
+	const result= decode( await Deno.readAll( process.stdout, ), );
+	
+	process.stdout.close();
+	process.close();
+	
+	return result;
+}
+
+function substr( line, start, length, )
+{
+	const output= [];
+	let size= 0;
+	let color= false;
+	
+	for( const char of line )
+	{
+		if( char === '\x1b' )
+			color= true;
+		else
+		if( !color )
+		{
+			size-=- (/[^\x00-\xff]/.test( char, )? 2: 1);
+		}
+		else
+		if( char === 'm' )
+			color= false;
+		
+		output.push( char, );
+		
+		while( size > length )
+		{
+			--size;
+			output.pop();
+		}
+		
+		if( size >= length )
+			break;
+	}
+	
+	return output.implode();
+}
