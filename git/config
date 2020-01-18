@@ -78,9 +78,9 @@
 	r-------h= reset --hard HEAD@{7}
 	fast-forward= merge --ff-only
 	ff= merge --ff-only
-	m= merge --no-ff
-	mb= merge --abort
-	mc= merge --continue
+	m= merge --no-ff --allow-unrelated-histories
+	mb= merge --abort --allow-unrelated-histories
+	mc= merge --continue --allow-unrelated-histories
 	mt= !git-merge-to
 	checkoutmerge= checkout --merge
 	om= checkout --merge
