@@ -123,18 +123,18 @@ async function getCharCode()
 	return buffer[0];
 }
 
-async function run( args, )
+async function run( cmd, )
 {
-	const process= Deno.run( { args, }, );
+	const process= Deno.run( { cmd, args:cmd, }, );
 	
 	await process.status();
 	
 	process.close();
 }
 
-async function call( args, )
+async function call( cmd, )
 {
-	const process= Deno.run( { args, stdout:'piped', }, );
+	const process= Deno.run( { cmd, args:cmd, stdout:'piped', }, );
 	
 	const result= decode( await Deno.readAll( process.stdout, ), );
 	
