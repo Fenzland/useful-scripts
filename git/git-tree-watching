@@ -175,5 +175,5 @@ function substr( line, start, length, )
 			break;
 	}
 	
-	return output.implode();
+	return `${output.implode()}\x1b[0m`;
 }
