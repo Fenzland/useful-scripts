@@ -1,0 +1,248 @@
+#!/usr/bin/env -S deno run --allow-run --allow-env --
+import 'https://better-js.fenz.land/index.js';
+import { encode, decode, } from 'https://oxo.fenzland.com/OsO/0.1/text-encoder.js';
+import Args from 'https://dragonfly.fenz.land/utils/Args.js';
+
+await run( [ 'stty', '-icanon', ] );
+await Deno.stdout.write( encode( '\x1b[7l', ), );
+
+let refresh= Promise.make();
+let rendering= { promise:null, async start(){ await this.promise; this.promise= Promise.make(); }, end(){ this.promise.resolve(); }, };
+let startY= 0;
+let startX= 0;
+let lines= 0;
+let columns= 0;
+
+const cmd= [];
+const options= [];
+
+for( const [ index, arg, ] of Deno.args.entries() )
+{
+	if (arg.startsWith( '-', ))
+		options.push( arg, );
+	else
+	{
+		cmd.push( ...Deno.args.slice( index, ), );
+		break;
+	}
+}
+const args= new Args( 'watching', ...options, );
+
+// render
+(async ()=> {
+	while( true )
+	{
+		lines= await call( [ 'tput', 'lines', ] );
+		columns= await call( [ 'tput', 'cols', ] );
+		
+		let content= await call( cmd, );
+		
+		if( args.hasOption( 'grep', ) )
+		{
+			const grep= args.getOption( 'grep', );
+			let filter;
+			try {
+				const regex= new RegExp( grep, );
+				
+				filter= line=> regex.test( line.replace( /\x1b\[\d*\w/, '', ), );
+			} catch {
+				filter= line=> line.replace( /\x1b\[\d*\w/, '', ).includes( grep, );
+			}
+			content= content.split( '\n', ).filter( filter, ).join( '\n', );
+		}
+		
+		await rendering.start();
+		
+		const sliced= content
+			.split( '\n', )
+			.slice( startY, startY - - lines )
+			.map( ( link, index, array, )=> substr( link, startX, columns, ), )
+			.implode( '\n', )
+		;
+		
+		if( !sliced )
+		{
+			if( startY > 0 )
+				--startY;
+			
+			continue;
+		}
+		
+		await Deno.stdout.write( encode( '\x1b[H\x1b[J\x1b[0m', ), );
+		await Deno.stdout.write( encode( sliced, ), );
+		await Deno.stdout.write( encode( '\x1b[H\x1b[30m', ), );
+		
+		rendering.end();
+		
+		await Promise.race( [ timeout( 1000, ), refresh, ], );
+		
+		refresh= Promise.make();
+	}
+})();
+
+// keyboard listen
+(async ()=> {
+	let specialKey= '';
+	
+	while( true )
+	{
+		
+		const charCode= await getCharCode();
+		
+		if( charCode === 0x1b )
+			specialKey= '\x1b';
+		else
+		if( specialKey.length )
+			specialKey+= String.fromCharCode( charCode, );
+		
+		const action= getAction( specialKey, );
+		
+		
+		if( action )
+		{
+			specialKey= '';
+			action();
+		}
+		else
+		if( specialKey.length > 5 )
+			specialKey= '';
+		
+		if( charCode === 0x71/*q*/ )
+		{
+			await rendering.start();
+			await Deno.stdout.write( encode( '\x1b[H\x1b[J\x1b[0m', ), );
+			rendering.end();
+			
+			Deno.exit();
+		}
+	}
+})();
+
+function getAction( char, )
+{
+	return {
+		'\x1b[5~'/*PageUp*/:()=> {
+			if( startY > lines )
+				startY-= lines;
+			else
+			if( startY > 0 )
+				startY= 0;
+			
+			refresh.resolve();
+		},
+		'\x1b[6~'/*PageDown*/:()=> {
+			startY-=- lines;
+			
+			refresh.resolve();
+		},
+		'\x1b[A'/*Up*/:()=> {
+			if( startY > 0 )
+				--startY;
+			
+			refresh.resolve();
+		},
+		'\x1b[B'/*Down*/:()=> {
+			++startY;
+			
+			refresh.resolve();
+		},
+		'\x1b[D'/*Left*/:()=> {
+			if( startX > 0 )
+				--startX;
+			
+			refresh.resolve();
+		},
+		'\x1b[C'/*Right*/:()=> {
+			++startX;
+			
+			refresh.resolve();
+		},
+		'\x1b[H'/*Home*/:()=> {
+			startX= 0;
+			
+			refresh.resolve();
+		},
+		'\x1b[F'/*End*/:()=> {
+			refresh.resolve();
+		},
+	}[char];
+}
+
+const cleanLine= (async ()=> {
+	await rendering.start();
+	Deno.stdout.write( encode( '\x1b[u\x1b[J', ), );
+	rendering.end();
+}).limit();
+
+async function getCharCode()
+{
+	const buffer= new Uint8Array( 1, );
+	await Deno.stdin.read( buffer, );
+	// await cleanLine();
+	return buffer[0];
+}
+
+async function run( cmd, )
+{
+	const process= Deno.run( { cmd, args:cmd, }, );
+	
+	await process.status();
+	
+	process.close();
+}
+
+async function call( cmd, )
+{
+	const process= Deno.run( { cmd, args:cmd, stdout:'piped', }, );
+	
+	const result= decode( await Deno.readAll( process.stdout, ), );
+	
+	process.stdout.close();
+	process.close();
+	
+	return result;
+}
+
+function substr( line, start, length, )
+{
+	const end= start - - length;
+	const output= [];
+	let size= 0;
+	let color= '';
+	let lastColor= '';
+	
+	for( const char of line )
+	{
+		if( char === '\x1b' )
+			color= char;
+		else
+		if( !color )
+		{
+			size-=- (/[^\x00-\xff]/.test( char, )? 2: 1);
+		}
+		else
+		if( char === 'm' )
+		{
+			if( size <= start )
+				lastColor= `${color}m`;
+			
+			color= null;
+		}
+		else
+			color+=''+ char
+		
+		if( size > start )
+			output.push( char, );
+		
+		while( size > end )
+		{
+			--size;
+			output.pop();
+		}
+		
+		if( size >= end )
+			break;
+	}
+	
+	return `${lastColor}${output.implode()}\x1b[0m`;
+}
