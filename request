@@ -1,0 +1,70 @@
+#!/usr/bin/env -S deno run --allow-net
+import 'https://better-js.fenz.land/index.js';
+
+const methods= new Set( [ 'OPTION', 'HEAD', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'CONNECT', 'TRACE', ], );
+
+let url;
+let method= 'GET';
+let body= '';
+let headers= new Headers();
+let query= [];
+let showJson= true;
+
+const parseOption= ( name, value, )=> {
+	switch( name )
+	{
+		case 'body':
+		{
+			body= value;
+		}
+		break;
+		
+		case 'raw':
+		{
+			showJson= false;
+		}
+		break;
+	}
+};
+
+for( const arg of Deno.args )
+{
+	if( arg.startsWith( '--', ) )
+		parseOption( ...arg.matchGroup( /^--(?<name>[-\w]+)(?:=(?<value>.*))?$/, [ 'name', 'value', ], ), );
+	else
+	if( arg.startsWith( 'http://', ) || arg.startsWith( 'https://', ) )
+		url= new URL( arg, );
+	else
+	if( arg.match( /^[\w-]+:/, ) )
+		headers.set( ...arg.matchGroup( /^(?<name>[\w-]+):(?<value>.*)$/, [ 'name', 'value', ], ), )
+	else
+	if( arg.startsWith( '?', ) )
+		query.push( arg.matchGroup( /^\?(?<name>[^=]+)=(?<value>.*)$/, [ 'name', 'value', ], ), )
+	else
+	if( methods.has( arg, ) )
+		method= arg;
+}
+
+if( !url )
+	throw 'url required';
+
+if( query.length )
+	query.forEach( ( [ key, value, ], )=> url.searchParams.append( key, value, ), );
+
+fetch( url, { method, headers, body, }, ).then( async response=> {
+	console.log( response.status, );
+	const body= await response.text();
+	
+	if( showJson )
+		try
+		{
+			console.log( JSON.stringify(JSON.parse(body), null, 4), );
+		}
+		catch
+		{
+			console.log( body, );
+		}
+	else
+		console.log( body, );
+}, e=> console.log(e.message), );
+
