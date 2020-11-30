@@ -1,35 +1,50 @@
 #!/bin/bash
 
-if [[ $(which tmux) == '' ]]
+if [ -z `which tmux` ]
 then
 	echo 'require tmux';
 	exit 1;
 fi
 
-if [[ $(which watch) == '' ]]
+if [ -z `which watch` ]
 then
 	echo 'require watch';
 	exit 1;
 fi
 
-if [[ $(which deno) == '' ]]
+if [ -z `which deno` ]
 then
 	echo 'require deno';
 	exit 1;
 fi
 
-if [[ $(which git-tree-watching) == '' ]]
+if [ -z `which fish` ]
 then
-	echo 'must deploy git-tree-watching';
-	exit 1;
+	shell='bash';
+else
+	shell='fish';
 fi
 
-if [[ $TMUX == '' ]]
+if [ -z $TMUX ]
 then
-	echo 'please run this command in tmux';
-	exit 1;
+	tmux new-session $shell -C "git watch $@";
+	
+	exit 0;
 fi
 
-tmux split-window -h -p50 watch -ct -n0.5 git -c color.status=always s;
-tmux split-window -v -p80 git tree-watching;
-tmux select-pane -t0;
+case $1 in
+	conflict)
+		tmux split-window -h -p20 watching --grep='^U' git -c color.status=always s;
+		tmux select-pane -t0;
+	;;
+	*)
+		tmux split-window -h -p50 watching git -c color.status=always s;
+		tmux split-window -v -p60 watching git reflog --color=always;
+		tmux split-window -h -p50 watching git branch -a --color=always;
+		tmux select-pane -t0;
+		tmux split-window -v -p80 -b watching git tree --color=always;
+		tmux select-pane -t1;
+	;;
+esac
+
+clear;
