@@ -34,13 +34,27 @@ fi
 
 case $1 in
 	conflict)
-		tmux split-window -h -p20 watching --grep='^U' git -c color.status=always s;
+		tmux split-window -h -p20 watching --grep='^U' git changes;
 		tmux select-pane -t0;
 	;;
+	path)
+		tmux split-window -h -p40 watching git changes -- $2;
+		tmux split-window -v -p30 watching git tree-branch --color=always -- $2;
+		tmux select-pane -t1;
+		tmux split-window -h -p30 watching git branches -- $2;
+		tmux select-pane -t1;
+		tmux split-window -v -p20 watching git reflog -a --color=always -- $2;
+		tmux select-pane -t0;
+		tmux split-window -v -p80 -b watching git tree --color=always -- $2;
+		tmux select-pane -t1;
+	;;
 	*)
-		tmux split-window -h -p50 watching git -c color.status=always s;
-		tmux split-window -v -p60 watching git reflog --color=always;
-		tmux split-window -h -p50 watching git branch -a --color=always;
+		tmux split-window -h -p40 watching git changes;
+		tmux split-window -v -p30 watching git tree-branch --color=always;
+		tmux select-pane -t1;
+		tmux split-window -h -p30 watching git branches;
+		tmux select-pane -t1;
+		tmux split-window -v -p20 watching git reflog -a --color=always;
 		tmux select-pane -t0;
 		tmux split-window -v -p80 -b watching git tree --color=always;
 		tmux select-pane -t1;
