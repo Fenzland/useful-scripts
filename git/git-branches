@@ -1,0 +1,26 @@
+#!/bin/bash
+
+IFS=$'\n';
+
+merged=$(git branch --color=never --merged "$@");
+current=$(echo "$merged" | grep '^\*');
+merged=($(echo "$merged" | grep -v '^\*'));
+unmerged=($(git branch --color=never --no-merged "$@"));
+remote=($(git branch --color=never -r "$@"));
+
+echo -ne "\e[32;7m$current\e[0m\n";
+
+for branch in "${merged[@]}"
+do
+	echo -ne "\e[32m$branch\e[0m\n";
+done
+
+for branch in "${unmerged[@]}"
+do
+	echo -ne "\e[30;1m$branch\e[0m\n";
+done
+
+for branch in "${remote[@]}"
+do
+	echo -ne "\e[31;1m$branch\e[0m\n";
+done
