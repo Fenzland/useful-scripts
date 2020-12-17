@@ -1,0 +1,17 @@
+#!/bin/bash
+
+branch=$(git symbolic-ref --short -q HEAD);
+
+if [ -z $branch ]
+then
+	current=$(git rev-list -1 HEAD);
+else
+	current=$branch;
+fi
+
+for target in "$@"
+do
+	git checkout $target;
+	git merge $current;
+	git checkout $current;
+done

@@ -81,7 +81,7 @@
 	m= merge --no-ff --allow-unrelated-histories
 	mb= merge --abort --allow-unrelated-histories
 	mc= merge --continue --allow-unrelated-histories
-	mt= !git-merge-to
+	mt= merge-to
 	checkoutmerge= checkout --merge
 	om= checkout --merge
 	b= branch
