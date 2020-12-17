@@ -147,8 +147,8 @@
 	mh= update-ref --no-deref HEAD
 	detach= update-ref --no-deref HEAD HEAD
 	dt= update-ref --no-deref HEAD HEAD
-	ref-to= symbolic-ref HEAD
-	rt= symbolic-ref HEAD
+	current-branch= symbolic-ref --short -q HEAD
+	cb= symbolic-ref --short -q HEAD
 	vp= rev-parse
 	git-dir= rev-parse --git-dir
 	git-path= rev-parse --git-path
