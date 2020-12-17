@@ -1,0 +1,30 @@
+#!/bin/bash
+
+list=$(git -c color.status=always status --short "$@");
+
+matches=(
+	'^(\e\[\d*m)?UU'	#UU
+	'^(\e\[\d*m)?\?\?'	#??
+	'^ (\e\[\d*m)?D'	# D
+	'^ (\e\[\d*m)?M'	# M
+	'^(\e\[\d*m)?R'	#R
+	'^(\e\[\d*m)?A'	#A
+	'^(\e\[\d*m)?M'	#M
+);
+
+for match in "${matches[@]}"
+do
+	echo "$list" | grep --color=never -P "$match";
+done
+
+function join { local IFS="|"; echo "$*"; }
+
+# join "${matches[@]}";
+echo "$list" | grep --color=never -Pv "^($(join "${matches[@]}"))";
+
+# if [ -f $(git rev-parse --absolute-git-dir)/MERGE_HEAD ]
+# then
+# 	git -c color.status=always status --short | grep --color=never ^U
+# else
+	
+# fi
